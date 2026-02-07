@@ -1,0 +1,28 @@
+train:
+  epochs: 10
+  batch_size: 64
+  lr: 0.001
+  optimizer: adam
+  scheduler: plateau
+  patience: 10
+  checkpoint_dir: models/checkpoints
+  grad_clip_norm: 1.0
+
+model:
+  name: simple_cnn
+  dataset: mnist
+
+data:
+  dataset: mnist
+  train_ratio: 0.8
+  augmentation: false
+  num_workers: 0
+
+attack:
+  attack_type: mia_threshold
+
+dp:
+  enabled: false
+  epsilon: 1.0
+  delta: 1.0e-5
+  max_grad_norm: 1.0

@@ -1,0 +1,14 @@
+model:
+  dataset: cifar100
+  name: resnet18
+
+data:
+  dataset: cifar100
+  train_ratio: 0.9
+  augmentation: true
+
+train:
+  epochs: 40
+  batch_size: 128
+  lr: 0.001
+  optimizer: adam
