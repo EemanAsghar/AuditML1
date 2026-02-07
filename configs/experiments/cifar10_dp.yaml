@@ -1,0 +1,6 @@
+model:
+  dataset: cifar10
+  name: resnet18
+dp:
+  enabled: true
+  epsilon: 1.0

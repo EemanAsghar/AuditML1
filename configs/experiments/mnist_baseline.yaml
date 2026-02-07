@@ -1,0 +1,5 @@
+model:
+  dataset: mnist
+  name: simple_cnn
+train:
+  epochs: 10
