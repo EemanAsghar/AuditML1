@@ -1,0 +1,13 @@
+train:
+  epochs: 10
+  batch_size: 64
+  lr: 0.001
+  optimizer: adam
+model:
+  name: simple_cnn
+  dataset: mnist
+dp:
+  enabled: false
+  epsilon: 1.0
+  delta: 1.0e-5
+  max_grad_norm: 1.0

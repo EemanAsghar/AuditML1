@@ -1,0 +1,4 @@
+model:
+  dataset: mnist
+train:
+  epochs: 5
