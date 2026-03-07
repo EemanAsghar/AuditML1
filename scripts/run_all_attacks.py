@@ -1,14 +1,22 @@
 """Run all attacks for a trained model and store JSON outputs.
 
 Usage:
-  PYTHONPATH=src python scripts/run_all_attacks.py --model models/baseline_mnist.pt --dataset mnist --output-dir results/attacks
+  python scripts/run_all_attacks.py --model models/baseline_mnist.pt --dataset mnist --output-dir results/attacks
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+for _p in (ROOT, SRC):
+    p = str(_p)
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import torch
 

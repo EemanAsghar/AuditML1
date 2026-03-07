@@ -1,14 +1,22 @@
 """Train differential privacy models for multiple datasets and epsilon levels.
 
 Usage:
-  PYTHONPATH=src python scripts/train_dp_models.py --epochs 1 --output-dir models/dp
+  python scripts/train_dp_models.py --epochs 1 --output-dir models/dp
 """
 
 from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+for _p in (ROOT, SRC):
+    p = str(_p)
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 import torch
 
@@ -56,7 +64,6 @@ def _evaluate(model, loader, criterion, device):
 
 
 def train_dp_model(dataset: str, epsilon: float, epochs: int, output_dir: Path, seed: int = 42):
-    # Simple heuristic mapping for an MVP pipeline.
     noise_map = {10.0: 0.5, 1.0: 1.5, 0.1: 5.0}
     noise = noise_map.get(float(epsilon), 1.5)
 
