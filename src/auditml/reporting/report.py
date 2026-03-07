@@ -16,5 +16,12 @@ class ReportGenerator:
         if df.empty:
             lines.append("No CSV results found.")
         else:
-            lines.append(df.groupby(["attack", "dataset"]).mean(numeric_only=True).to_markdown())
+            summary = df.groupby(["attack", "dataset"]).mean(numeric_only=True).reset_index()
+            try:
+                lines.append(summary.to_markdown(index=False))
+            except ImportError:
+                # Fallback when optional `tabulate` dependency is unavailable.
+                lines.append("```csv")
+                lines.append(summary.to_csv(index=False).strip())
+                lines.append("```")
         Path(out_path).write_text("\n".join(lines), encoding="utf-8")
