@@ -30,7 +30,15 @@ auditml attack mia-threshold --model models/baseline_mnist.pt --data mnist --out
 - `scripts/`: helper scripts
 - `tests/`: test suite skeleton
 - `docs/`: documentation
+- `notebooks/`: experimental notebooks
+- `models/`: saved checkpoints and exported models
+- `results/`: generated attack outputs and reports
 
 ## Status
 
 Initial end-to-end scaffold is included with CLI, training, attacks, and report module stubs to support incremental development.
+
+
+## License
+
+MIT
