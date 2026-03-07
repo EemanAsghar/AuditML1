@@ -1,28 +1,55 @@
-"""Run a compact full validation matrix across datasets/privacy levels/attacks.
-
-This is an MVP orchestration script for repeatable experiments.
-"""
+"""Run a compact validation matrix across datasets/privacy levels/attacks."""
 
 from __future__ import annotations
 
 import argparse
 import csv
-import json
 from pathlib import Path
 
-from run_all_attacks import run_attack, ATTACKS
+try:
+    from run_all_attacks import ATTACKS, run_attack
+except ModuleNotFoundError:  # pragma: no cover
+    from scripts.run_all_attacks import ATTACKS, run_attack
 
 
-def _read_metric_file(path: Path):
-    if not path.exists():
-        return {}
-    return json.loads(path.read_text(encoding="utf-8"))
+def resolve_model_path(dataset: str, kind: str, model_pattern: str | None = None) -> Path | None:
+    candidates: list[Path] = []
+
+    if model_pattern:
+        candidates.append(Path(model_pattern.format(kind=kind, dataset=dataset)))
+
+    if kind == "baseline":
+        candidates.extend(
+            [
+                Path(f"models/baselines/{dataset}/model.pt"),
+                Path(f"models/baseline_{dataset}.pt"),
+            ]
+        )
+    elif kind.startswith("dp_eps"):
+        eps = kind.replace("dp_eps", "")
+        candidates.extend(
+            [
+                Path(f"models/dp/{dataset}_eps{eps}.pt"),
+                Path(f"models/{kind}_{dataset}.pt"),
+            ]
+        )
+    else:
+        candidates.append(Path(f"models/{kind}_{dataset}.pt"))
+
+    for candidate in candidates:
+        if candidate.exists():
+            return candidate
+    return None
 
 
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--datasets", nargs="+", default=["mnist", "cifar10", "cifar100"])
-    parser.add_argument("--model-pattern", default="models/{kind}_{dataset}.pt", help="supports {kind} and {dataset}")
+    parser.add_argument(
+        "--model-pattern",
+        default=None,
+        help="optional explicit template supporting {kind} and {dataset}",
+    )
     parser.add_argument("--kinds", nargs="+", default=["baseline", "dp_eps10", "dp_eps1", "dp_eps0.1"])
     parser.add_argument("--output-dir", default="results/validation")
     args = parser.parse_args()
@@ -30,12 +57,12 @@ def main():
     output_dir = Path(args.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    rows = []
+    rows: list[dict[str, float | str]] = []
     for dataset in args.datasets:
         for kind in args.kinds:
-            model_path = Path(args.model_pattern.format(kind=kind, dataset=dataset))
-            if not model_path.exists():
-                print(f"[SKIP] missing model: {model_path}")
+            model_path = resolve_model_path(dataset, kind, args.model_pattern)
+            if model_path is None:
+                print(f"[SKIP] missing model for dataset={dataset} kind={kind}")
                 continue
 
             exp_dir = output_dir / dataset / kind
